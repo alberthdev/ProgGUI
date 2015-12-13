@@ -25,6 +25,8 @@ class ProgressQueueThread(QtCore.QThread):
                             "setCancelLbl"     : self.funcMap(self.setCancelLbl, 1),
                             "setCancelEnabled" : self.funcMap(self.setCancelEnabled, 1),
                             "closeWindow"      : self.funcMap(self.closeWindow, 0),
+                            "hideWindow"       : self.funcMap(self.hideWindow, 0),
+                            "showWindow"       : self.funcMap(self.showWindow, 0),
                             "enableCancel"     : self.funcMap(self.setCancelEnabled, 1, [True]),
                             "disableCancel"    : self.funcMap(self.setCancelEnabled, 1, [False]),
                             "setPulseEnabled"  : self.funcMap(self.setPulseEnabled, 1),
@@ -110,7 +112,12 @@ class ProgressQueueThread(QtCore.QThread):
     
     def closeWindow(self):
         self.window.closeUpdate.emit()
-        
+    
+    def hideWindow(self):
+        self.window.hideUpdate.emit()
+    
+    def showWindow(self):
+        self.window.showUpdate.emit()
 
 class ProgressWindow(QtGui.QDialog, ProgGUI.Ui_progDlg):
     progUpdate = pyqtSignal(int)
@@ -119,6 +126,8 @@ class ProgressWindow(QtGui.QDialog, ProgGUI.Ui_progDlg):
     cancelEnableUpdate = pyqtSignal(bool)
     pulseEnableUpdate = pyqtSignal(bool)
     closeUpdate = pyqtSignal()
+    hideUpdate = pyqtSignal()
+    showUpdate = pyqtSignal()
     
     def __init__(self, title = None, status = None, cur_progress = 0,
         cancel_label = None, cancel_enabled = True, pulsing = False,
@@ -148,6 +157,8 @@ class ProgressWindow(QtGui.QDialog, ProgGUI.Ui_progDlg):
         self.cancelLblUpdate.connect(self.updateCancelLbl)
         self.cancelEnableUpdate.connect(self.updateCancelEnable)
         self.closeUpdate.connect(self.updateClose)
+        self.hideUpdate.connect(self.updateHide)
+        self.showUpdate.connect(self.updateShow)
         self.pulseEnableUpdate.connect(self.updatePulse)
         
         self.comm_queue = comm_queue
@@ -210,4 +221,10 @@ class ProgressWindow(QtGui.QDialog, ProgGUI.Ui_progDlg):
         self.can_close = True
         self.regular_close = True
         self.close()
+    
+    def updateHide(self):
+        self.hide()
+    
+    def updateShow(self):
+        self.show()
     
